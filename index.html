@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Missions Map · Rochester Christian Church</title>
+<meta name="description" content="See where the missionaries Rochester Christian Church supports are serving around the world, and learn how to pray for them.">
+<link rel="icon" href="assets/logo-blue.png">
+<style>
+@font-face{font-family:Poppins;font-weight:400;font-display:swap;src:url(assets/poppins-400.woff2) format('woff2')}
+@font-face{font-family:Poppins;font-weight:500;font-display:swap;src:url(assets/poppins-500.woff2) format('woff2')}
+@font-face{font-family:Poppins;font-weight:600;font-display:swap;src:url(assets/poppins-600.woff2) format('woff2')}
+@font-face{font-family:Poppins;font-weight:700;font-display:swap;src:url(assets/poppins-700.woff2) format('woff2')}
+:root{
+  --navy:#05142b;--blue:#2589e5;--blue-d:#145fa4;--paper:#fafafa;--ink:#05142b;--muted:#5e6778;--line:#e4e9f0;
+  --ocean:#d9e7f6;--land:#eef1f5;--land-line:#c9d3df;--has:#ffffff;--card:#fff;
+  --shadow:0 24px 60px -28px rgba(5,20,43,.45),0 0 0 1px rgba(5,20,43,.05);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:Poppins,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+a{color:var(--blue-d)}
+:focus-visible{outline:3px solid rgba(37,137,229,.45);outline-offset:2px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;color:#fff;padding:26px 20px 104px;
+  background:radial-gradient(900px 420px at 88% -10%,rgba(37,137,229,.42),transparent 62%),
+             radial-gradient(700px 360px at -5% 120%,rgba(37,137,229,.18),transparent 60%),var(--navy)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.10;
+  background-image:radial-gradient(#fff 1px,transparent 1.4px);background-size:18px 18px;
+  -webkit-mask-image:linear-gradient(100deg,transparent 35%,#000 85%);mask-image:linear-gradient(100deg,transparent 35%,#000 85%)}
+.hero .bar,.hero .in{position:relative;z-index:1;max-width:1240px;margin:0 auto}
+.hero .bar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hero .bar img{height:42px;width:auto;display:block}
+.hero .bar a.site{color:#fff;text-decoration:none;font-size:14px;font-weight:500;border:1px solid rgba(255,255,255,.3);padding:9px 16px;border-radius:999px}
+.hero .bar a.site:hover{background:rgba(255,255,255,.08)}
+.hero .in{margin-top:56px}
+.kicker{margin:0;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#8fc6f8}
+h1{margin:10px 0 14px;font-size:clamp(34px,5.4vw,58px);line-height:1.04;font-weight:700;letter-spacing:-.02em}
+.lead{margin:0;max-width:58ch;font-size:17px;line-height:1.65;color:#c8d3e3}
+.stats{display:flex;flex-wrap:wrap;gap:14px 40px;margin-top:30px}
+.stat b{display:block;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.01em}
+.stat span{font-size:13px;color:#9db0c8}
+
+/* ---------- app ---------- */
+.wrap{position:relative;max-width:1240px;margin:-64px auto 0;padding:0 20px 40px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:20px;height:660px}
+.mapcard,.panel{background:var(--card);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+.mapcard{position:relative;display:flex;flex-direction:column;min-width:0}
+.chips{flex:none;display:flex;gap:8px;padding:12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 15px;border:1px solid var(--line);border-radius:999px;background:#fff;
+  color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.chip:hover{border-color:#c9d4e2}
+.chip .sw{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip[aria-pressed="true"] .sw{box-shadow:0 0 0 2px var(--navy),0 0 0 3.5px rgba(255,255,255,.7)}
+.mapbox{position:relative;flex:1;min-height:0}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;background:var(--ocean);cursor:grab}
+#map:active{cursor:grabbing}
+.grat{fill:none;stroke:#cddcee;stroke-width:.6;vector-effect:non-scaling-stroke}
+.c{fill:var(--land);stroke:var(--land-line);stroke-width:.6;vector-effect:non-scaling-stroke;transition:fill .25s}
+.c.has{fill:var(--has);cursor:pointer}
+.c.has:hover{fill:#e8f2fd}
+.lake{fill:var(--ocean);stroke:var(--land-line);stroke-width:.5;vector-effect:non-scaling-stroke;pointer-events:none}
+.pin{cursor:pointer;outline:none}
+.pin .dot{stroke:#fff;stroke-width:2.5;filter:drop-shadow(0 2px 3px rgba(5,20,43,.35))}
+.pin .halo{opacity:0;transition:opacity .15s}
+.pin:hover .halo,.pin:focus-visible .halo,.pin.hot .halo{opacity:.28}
+.pin.sel .dot{stroke:var(--navy);stroke-width:3}
+.pin.sel .halo{opacity:.35;transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-out infinite}
+.pin text{fill:#fff;font:600 11px Poppins,system-ui,sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+@keyframes pulse{0%{transform:scale(.8);opacity:.5}100%{transform:scale(2);opacity:0}}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 6px 20px -8px rgba(5,20,43,.35),0 0 0 1px rgba(5,20,43,.06);overflow:hidden}
+.zoom button{width:40px;height:40px;border:0;background:#fff;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.zoom button+button{border-top:1px solid var(--line)}
+.zoom button:hover{background:#f2f6fb}
+.tip{position:absolute;z-index:3;pointer-events:none;max-width:240px;padding:7px 11px;border-radius:9px;background:var(--navy);color:#fff;font-size:12.5px;line-height:1.35;
+  transform:translate(-50%,calc(-100% - 14px));white-space:nowrap;box-shadow:0 8px 20px -8px rgba(5,20,43,.6)}
+.tip small{display:block;color:#9fb3cc;font-size:11.5px}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:14px;color:var(--muted)}
+.hint{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 14px;border-radius:999px;background:rgba(5,20,43,.82);color:#fff;font-size:12.5px;
+  opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.hint.on{opacity:1}
+
+/* ---------- panel ---------- */
+.panel{display:flex;flex-direction:column;min-width:0}
+.search{flex:none;padding:12px;border-bottom:1px solid var(--line)}
+.search label{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 14px;border-radius:999px;background:#f2f5f9;color:var(--muted)}
+.search label:focus-within{background:#fff;box-shadow:0 0 0 2px var(--blue)}
+.search input{flex:1;min-width:0;border:0;background:none;outline:none;font:400 16px Poppins,system-ui,sans-serif;color:var(--ink)}
+#view{flex:1;overflow-y:auto;padding:4px 20px 24px;overscroll-behavior:contain}
+.back{display:inline-flex;align-items:center;gap:4px;margin:12px 0 2px -4px;padding:6px 8px 6px 4px;border:0;border-radius:8px;background:none;color:var(--blue-d);font-size:13.5px;font-weight:500;cursor:pointer}
+.back:hover{background:#eef4fb}
+.eyebrow{margin:18px 0 0;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-d)}
+.vh h2{margin:6px 0 6px;font-size:22px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+.vh .sub{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.55}
+.vh .rbar{width:36px;height:4px;border-radius:4px;background:var(--c);margin-top:16px}
+.regions{list-style:none;margin:8px 0 0;padding:0}
+.reg{display:flex;align-items:center;gap:12px;width:100%;padding:13px 10px;border:0;border-radius:14px;background:none;color:var(--ink);font-size:15px;font-weight:500;text-align:left;cursor:pointer}
+.reg:hover{background:#f3f6fa}
+.reg .sw{flex:none;width:12px;height:12px;border-radius:50%;background:var(--c)}
+.reg .rn{flex:1}
+.reg .ct{font-size:13px;color:var(--muted);font-weight:500}
+.reg svg{color:#a9b4c3}
+.group{margin:18px 0 4px 10px;font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.card{display:flex;align-items:center;gap:12px;width:100%;padding:9px 10px;border:0;border-radius:14px;background:none;color:inherit;text-align:left;cursor:pointer}
+.card:hover,.card:focus-visible{background:#f3f6fa}
+.av{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;overflow:hidden;font-size:14px;font-weight:600;
+  color:var(--c);background:#eef2f7;background:color-mix(in srgb,var(--c) 14%,#fff)}
+.av img{width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.ci{min-width:0;flex:1}
+.nm{display:block;font-size:15px;font-weight:600;line-height:1.3}
+.og,.pl{display:block;font-size:13px;line-height:1.4;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl{display:flex;align-items:center;gap:4px;font-size:12.5px}
+.pl svg{flex:none}
+.note{display:flex;gap:12px;margin:18px 0 0;padding:14px;border-radius:16px;background:#f5f7fa;color:var(--muted);font-size:13px;line-height:1.55}
+.note svg{flex:none;margin-top:2px;color:var(--ink)}
+.note b{color:var(--ink);font-weight:600}
+.av.lock{color:#5e6778;background:#eef1f5}
+.person .av.lock svg{width:34px;height:34px}
+.gnote{margin:2px 10px 6px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.person .note{margin-top:24px}
+.empty{padding:28px 6px;color:var(--muted);font-size:14px;line-height:1.6}
+
+.person .av{width:96px;height:96px;font-size:28px;margin-top:16px}
+.person .ph{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:50% 30%;border-radius:18px;margin-top:14px;background:#eef2f7}
+.person h2{margin:14px 0 4px;font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.01em}
+.person .org{margin:0;color:var(--muted);font-size:14.5px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:#f2f5f9;font-size:12.5px;font-weight:500;color:var(--ink)}
+.tag .sw{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.sec{margin-top:24px}
+.sec h3{margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sec p{margin:0;font-size:15px;line-height:1.65}
+.sec p.soon{color:var(--muted);font-style:italic}
+.pray{list-style:none;margin:0;padding:0}
+.pray li{position:relative;padding:0 0 10px 22px;font-size:15px;line-height:1.55}
+.pray li::before{content:"";position:absolute;left:4px;top:.6em;width:7px;height:7px;border-radius:50%;background:var(--c)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14px;font-weight:500;text-decoration:none;cursor:pointer}
+.btn:hover{border-color:#c9d4e2}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.pri:hover{background:var(--blue-d);border-color:var(--blue-d)}
+
+footer{max-width:1240px;margin:0 auto;padding:8px 20px 40px;color:var(--muted);font-size:13px;line-height:1.6;text-align:center}
+footer a{color:var(--muted)}
+
+/* embed mode: ?embed=1 shows only the map + panel (for an iframe on the church website) */
+html.embed body{background:transparent}
+html.embed .hero,html.embed footer{display:none}
+html.embed .wrap{margin:0;padding:12px}
+
+@media (max-width:900px){
+  .hero{padding-bottom:88px}
+  .hero .in{margin-top:36px}
+  .lead{font-size:16px}
+  .stat b{font-size:26px}
+  .wrap{margin-top:-56px;padding:0 12px 28px}
+  .app{grid-template-columns:1fr;height:auto;gap:14px}
+  .mapbox{flex:none;aspect-ratio:1.75/1;min-height:230px}
+  .panel{overflow:visible}
+  #view{overflow:visible;padding:4px 16px 20px}
+  .hero .bar a.site{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="bar">
+    <a href="https://rochesterchristian.church" aria-label="Rochester Christian Church home"><img src="assets/logo-white.png" alt="Rochester Christian Church"></a>
+    <a class="site" href="https://rochesterchristian.church">rochesterchristian.church</a>
+  </div>
+  <div class="in">
+    <p class="kicker">Missions</p>
+    <h1>Where our missionaries serve</h1>
+    <p class="lead">Together we support missionaries and ministries around the world and here at home. Choose a region, a country or a pin to meet them and learn how to pray for them.</p>
+    <div class="stats">
+      <div class="stat"><b id="stTotal">&nbsp;</b><span>missionaries &amp; ministries</span></div>
+      <div class="stat"><b id="stCountries">&nbsp;</b><span>countries</span></div>
+      <div class="stat"><b id="stRegions">&nbsp;</b><span>regions of the world</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="app">
+    <div class="mapcard">
+      <div class="chips" id="chips" role="toolbar" aria-label="Regions"></div>
+      <div class="mapbox" id="mapbox">
+        <svg id="map" role="img" aria-label="World map showing where our missionaries serve"></svg>
+        <div class="overlay" id="loading">Loading map…</div>
+        <div class="tip" id="tip" hidden></div>
+        <div class="hint" id="hint">Hold Ctrl (or ⌘) and scroll to zoom</div>
+        <div class="zoom">
+          <button id="zin" aria-label="Zoom in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button id="zout" aria-label="Zoom out"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+          <button id="zreset" aria-label="Show the whole world"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel" id="panel" aria-label="Missionaries">
+      <div class="search">
+        <label>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="q" type="search" placeholder="Search name, ministry or country" aria-label="Search missionaries" autocomplete="off">
+        </label>
+      </div>
+      <div id="view" aria-live="polite"></div>
+    </aside>
+  </section>
+</main>
+
+<footer>
+  Rochester Christian Church · 4435 N Rochester Rd, Rochester, MI 48306 · <a href="https://rochesterchristian.church">rochesterchristian.church</a>
+</footer>
+
+<script src="assets/d3.min.js"></script>
+<script src="assets/topojson-client.min.js"></script>
+<script src="missionaries.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ---------- data ----------
+  var REG = {}; REGIONS.forEach(function (r) { REG[r.key] = r; });
+  var ALL = MISSIONARIES;
+  var PUBLIC = ALL.filter(function (m) { return !m.s; });
+  var SENS = ALL.filter(function (m) { return m.s; });
+  var BY_ID = {}; ALL.forEach(function (m) { BY_ID[m.id] = m; });
+  var COUNTRY_OVERRIDE = { 'la-19': 'French Antilles' };   // islands that belong to a bigger country's shape
+  var NICE = { 'United States of America': 'United States', 'Dominican Rep.': 'Dominican Republic', 'Antigua and Barb.': 'Antigua & Barbuda', 'Czechia': 'Czech Republic' };
+  var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var MOBILE = window.matchMedia('(max-width: 900px)');
+  if (/[?&]embed=1\b/.test(location.search)) document.documentElement.classList.add('embed');
+
+  // Every piece of text from the data goes through esc() before it is placed in markup.
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var setHTML = function (el, html) { el.replaceChildren(document.createRange().createContextualFragment(html)); };
+  var plural = function (n, one, many) { return n + ' ' + (n === 1 ? one : many); };
+  var initials = function (n) {
+    var w = n.replace(/[^A-Za-z\s&.'-]/g, '').split(/\s+/).filter(function (x) { return /^[A-Za-z]/.test(x); });
+    if (!w.length) return '?';
+    if (w.length === 1) return w[0].slice(0, 2).toUpperCase();
+    return (w[0][0] + w[w.length - 1][0]).toUpperCase();
+  };
+  var countIn = function (key) { return ALL.filter(function (m) { return m.r === key; }).length; };
+  var safeUrl = function (u) { return /^(https?:\/\/|photos\/)/i.test(String(u || '')) ? u : ''; };
+
+  // ---------- icons ----------
+  var I = {
+    pin: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+    globe: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
+    right: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>',
+    left: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>',
+    lock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    share: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v14"/></svg>',
+    link: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+  };
+  function avatar(m) {
+    var src = safeUrl(m.photo);
+    return src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : esc(initials(m.n));
+  }
+
+  // ---------- state ----------
+  var state = { region: null, country: null, selected: null, query: '' };
+  var stack = [], cur = null;
+
+  // ---------- map ----------
+  var svg = d3.select('#map');
+  var gWorld = svg.append('g');
+  var gPins = svg.append('g');
+  var projection = d3.geoNaturalEarth1();
+  var path = d3.geoPath(projection);
+  var W = 0, H = 0, T = d3.zoomIdentity, countries = [], landFC = null, ready = false, instant = false;
+  var MAXK = 140;
+  var tip = document.getElementById('tip'), hint = document.getElementById('hint');
+  var hintTimer;
+
+  var zoom = d3.zoom().scaleExtent([1, MAXK])
+    .filter(function (ev) {
+      if (ev.type === 'wheel') {
+        if (ev.ctrlKey || ev.metaKey) return true;
+        hint.classList.add('on'); clearTimeout(hintTimer);
+        hintTimer = setTimeout(function () { hint.classList.remove('on'); }, 1300);
+        return false;
+      }
+      return !ev.button;
+    })
+    .on('zoom', function (ev) { T = ev.transform; gWorld.attr('transform', T); drawPins(); hideTip(); });
+  svg.call(zoom);
+
+  function proj(m) { return projection([m.p[1], m.p[0]]); }
+  function moveTo(t) { (REDUCE || instant ? svg : svg.transition().duration(800).ease(d3.easeCubicInOut)).call(zoom.transform, t); }
+
+  function layout() {
+    var r = svg.node().getBoundingClientRect();
+    if (!r.width || (r.width === W && r.height === H)) return;
+    W = r.width; H = r.height;
+    projection.fitExtent([[12, 12], [W - 12, H - 12]], landFC);
+    gWorld.selectAll('path').attr('d', path);
+    zoom.translateExtent([[0, 0], [W, H]]).extent([[0, 0], [W, H]]);
+    svg.call(zoom.transform, d3.zoomIdentity);
+    if (cur) render(cur, { zoom: true, instant: true });
+  }
+
+  function zoomToBox(b, pad, maxK) {
+    var w = Math.max(b[1][0] - b[0][0], 1e-6), h = Math.max(b[1][1] - b[0][1], 1e-6);
+    var k = Math.max(1, Math.min(maxK || MAXK, MAXK, (W - pad * 2) / w, (H - pad * 2) / h));
+    var cx = (b[0][0] + b[1][0]) / 2, cy = (b[0][1] + b[1][1]) / 2;
+    moveTo(k === 1 ? d3.zoomIdentity : d3.zoomIdentity.translate(W / 2 - cx * k, H / 2 - cy * k).scale(k));
+  }
+  function boxOf(list, padDeg) {
+    var pts = [];
+    list.forEach(function (m) {
+      if (!m.p) return;
+      [[-padDeg, -padDeg], [padDeg, padDeg], [-padDeg, padDeg], [padDeg, -padDeg]].forEach(function (o) { pts.push(projection([m.p[1] + o[0], m.p[0] + o[1]])); });
+    });
+    if (!pts.length) return null;
+    return [[d3.min(pts, function (p) { return p[0]; }), d3.min(pts, function (p) { return p[1]; })],
+            [d3.max(pts, function (p) { return p[0]; }), d3.max(pts, function (p) { return p[1]; })]];
+  }
+  function resetZoom() { moveTo(d3.zoomIdentity); }
+  function zoomRegion(key) {
+    var b = boxOf(PUBLIC.filter(function (m) { return m.r === key; }), 3);
+    if (b) zoomToBox(b, 40, 14); else resetZoom();
+  }
+  function zoomPerson(m) {
+    if (!m.p) { zoomRegion(m.r); return; }
+    var michigan = m.p[1] > -90 && m.p[1] < -82 && m.p[0] > 41.5 && m.p[0] < 46;
+    zoomToBox(boxOf([m], michigan ? 0.9 : 5), 30);
+  }
+
+  function matches(m, qs) {
+    var hay = (m.n + ' ' + (m.o || '') + ' ' + (m.m || '') + ' ' + m.at + ' ' + (m.country || '') + ' ' + REG[m.r].name).toLowerCase();
+    return qs.toLowerCase().split(/\s+/).every(function (w) { return hay.indexOf(w) > -1; });
+  }
+  function visiblePins() {
+    return PUBLIC.filter(function (m) {
+      return m.p && (!state.region || m.r === state.region) && (!state.query || matches(m, state.query));
+    });
+  }
+
+  function drawPins() {
+    if (!ready) return;
+    var R = 17, clusters = [];
+    visiblePins().forEach(function (m) {
+      var b = proj(m), s = T.apply(b), best = null, bd = R * R;
+      for (var i = 0; i < clusters.length; i++) {
+        var c = clusters[i], d = (c.x - s[0]) * (c.x - s[0]) + (c.y - s[1]) * (c.y - s[1]);
+        if (d < bd) { bd = d; best = c; }
+      }
+      var item = { m: m, bx: b[0], by: b[1] };
+      if (best) { best.items.push(item); var n = best.items.length; best.x += (s[0] - best.x) / n; best.y += (s[1] - best.y) / n; }
+      else clusters.push({ x: s[0], y: s[1], items: [item] });
+    });
+    clusters.forEach(function (c) {
+      c.key = c.items.map(function (i) { return i.m.id; }).sort().join('|');
+      var regs = {}; c.items.forEach(function (i) { regs[i.m.r] = 1; });
+      var rk = Object.keys(regs);
+      c.color = rk.length === 1 ? REG[rk[0]].color : '#05142b';
+      c.sel = !!state.selected && c.items.some(function (i) { return i.m.id === state.selected; });
+      c.r = c.items.length > 1 ? 10 + Math.sqrt(c.items.length) * 2.4 : 7;
+    });
+
+    var sel = gPins.selectAll('g.pin').data(clusters, function (d) { return d.key; });
+    sel.exit().remove();
+    var en = sel.enter().append('g').attr('class', 'pin').attr('tabindex', 0).attr('role', 'button')
+      .on('click', function (ev, d) { ev.stopPropagation(); clickCluster(d); })
+      .on('keydown', function (ev, d) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); clickCluster(d); } })
+      .on('mouseenter focus', function (ev, d) { showTip(d.x, d.y - d.r + 4, tipParts(d)); })
+      .on('mouseleave blur', hideTip);
+    en.append('circle').attr('class', 'halo');
+    en.append('circle').attr('class', 'dot');
+    en.append('text');
+    var all = en.merge(sel);
+    all.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+      .classed('sel', function (d) { return d.sel; })
+      .attr('aria-label', function (d) { var t = tipParts(d); return t[0] + ', ' + t[1]; });
+    all.select('.dot').attr('r', function (d) { return d.r; }).attr('fill', function (d) { return d.color; });
+    all.select('.halo').attr('r', function (d) { return d.r + 7; }).attr('fill', function (d) { return d.color; });
+    all.select('text').text(function (d) { return d.items.length > 1 ? d.items.length : ''; });
+    all.filter(function (d) { return d.sel; }).raise();
+  }
+
+  function placeOf(ms) {
+    var c = {}; ms.forEach(function (m) { c[m.country || m.at] = 1; });
+    var k = Object.keys(c); return k.length === 1 ? k[0] : null;
+  }
+  function tipParts(d) {
+    if (d.items.length === 1) return [d.items[0].m.n, d.items[0].m.at];
+    var p = placeOf(d.items.map(function (i) { return i.m; }));
+    return [plural(d.items.length, 'missionary', 'missionaries'), p || 'Tap to zoom in'];
+  }
+  function showTip(x, y, parts) {
+    if (MOBILE.matches) return;
+    var small = document.createElement('small');
+    small.textContent = parts[1];
+    tip.replaceChildren(document.createTextNode(parts[0]), small);
+    tip.hidden = false; tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function hideTip() { tip.hidden = true; }
+
+  function clickCluster(d) {
+    hideTip();
+    if (d.items.length === 1) { openPerson(d.items[0].m.id, { zoom: false, fromMap: true }); return; }
+    var xs = d.items.map(function (i) { return i.bx; }), ys = d.items.map(function (i) { return i.by; });
+    var b = [[d3.min(xs), d3.min(ys)], [d3.max(xs), d3.max(ys)]];
+    var spread = Math.max(b[1][0] - b[0][0], b[1][1] - b[0][1]) * T.k;
+    if (spread > 2 && T.k < MAXK) {
+      var pad = 6 / T.k;
+      zoomToBox([[b[0][0] - pad, b[0][1] - pad], [b[1][0] + pad, b[1][1] + pad]], 60);
+    }
+    var ms = d.items.map(function (i) { return i.m; });
+    show({ t: 'list', title: placeOf(ms) || 'Missionaries in this area', ids: ms.map(function (m) { return m.id; }) }, { zoom: false });
+  }
+
+  function paintCountries() {
+    gWorld.selectAll('path.c').style('fill', function (d) {
+      if (!d.ms) return null;
+      if (state.country === d) return d3.color(REG[d.ms[0].r].color).copy({ opacity: .42 }) + '';
+      if (state.region && d.ms.some(function (m) { return m.r === state.region; })) return d3.color(REG[state.region].color).copy({ opacity: .16 }) + '';
+      return null;
+    });
+  }
+
+  // ---------- panel ----------
+  var view = document.getElementById('view'), panel = document.getElementById('panel'), q = document.getElementById('q');
+
+  function card(m) {
+    var r = REG[m.r];
+    var org = m.o && m.o !== m.n ? m.o : (m.m || '');
+    return '<button class="card" data-open="' + esc(m.id) + '">' +
+      '<span class="av" style="--c:' + r.color + '">' + avatar(m) + '</span>' +
+      '<span class="ci"><span class="nm">' + esc(m.n) + '</span>' +
+      (org ? '<span class="og">' + esc(org) + '</span>' : '') +
+      '<span class="pl">' + (m.p ? I.pin : I.globe) + esc(m.at) + '</span></span></button>';
+  }
+  function grouped(list) {
+    var groups = {}, order = [];
+    list.forEach(function (m) { var k = m.country || m.at; if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(m); });
+    order.sort(function (a, b) { return a.localeCompare(b); });
+    return order.map(function (k) {
+      groups[k].sort(function (a, b) { return a.n.localeCompare(b.n); });
+      return '<div class="group">' + esc(k) + ' · ' + groups[k].length + '</div>' + groups[k].map(card).join('');
+    }).join('');
+  }
+  function lockNote(n) {
+    return '<div class="note">' + I.lock + '<div><b>' + plural(n, 'more serves', 'more serve') + ' in sensitive places.</b> ' +
+      'To protect them and their work, we don\'t show their names, photos or exact locations online. You\'ll find a prayer card for each of them in their region.</div></div>';
+  }
+  var sensTitle = function (m) { return m.who + ' serving in ' + m.area; };
+  function sensCard(m) {
+    return '<button class="card" data-sens="' + esc(m.id) + '"><span class="av lock">' + I.lock + '</span>' +
+      '<span class="ci"><span class="nm">' + esc(sensTitle(m)) + '</span><span class="og">Name kept private for their safety</span></span></button>';
+  }
+  function sensSection(key) {
+    var list = SENS.filter(function (m) { return m.r === key; });
+    if (!list.length) return '';
+    list.sort(function (a, b) { return a.area.localeCompare(b.area); });
+    return '<div class="group">Serving in sensitive places · ' + list.length + '</div>' +
+      '<p class="gnote">Their names and exact locations stay private. Tap a card to see how to pray for them.</p>' + list.map(sensCard).join('');
+  }
+  function sensHTML(m) {
+    var r = REG[m.r];
+    var pray = (m.pray && m.pray.length) ? m.pray : null;
+    var defaults = ['For safety, wisdom and protection for them and their family.', 'For open doors and open hearts among the people they serve.',
+      'For strength, rest and encouragement when the work is hard and slow.', 'For the local believers they walk alongside.'];
+    return backBtn() + '<div class="person" style="--c:' + r.color + '">' +
+      '<span class="av lock">' + I.lock + '</span>' +
+      '<h2>' + esc(sensTitle(m)) + '</h2><p class="org">Name and location kept private for their safety</p>' +
+      '<div class="tags"><span class="tag"><span class="sw"></span>' + esc(r.name) + '</span></div>' +
+      '<div class="sec"><h3>How to pray</h3><ul class="pray">' + (pray || defaults).map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+        (pray ? '' : '<p class="soon" style="font-size:13.5px;margin-top:2px">Specific prayer requests are coming soon.</p>') + '</div>' +
+      '<div class="note">' + I.lock + '<div>Please don\'t try to identify them or share guesses about who they are online. Keeping their names private helps keep them and the people they serve safe.</div></div></div>';
+  }
+  var backBtn = function (label) { return '<button class="back" data-back>' + I.left + esc(label || 'Back') + '</button>'; };
+
+  function homeHTML() {
+    var hidden = ALL.length - PUBLIC.length;
+    return '<div class="vh"><p class="eyebrow">Explore</p><h2>Meet our missionaries</h2>' +
+      '<p class="sub">Choose a region, tap a country or a pin on the map, or search by name.</p></div>' +
+      '<ul class="regions">' + REGIONS.map(function (r) {
+        return '<li><button class="reg" data-region="' + r.key + '"><span class="sw" style="--c:' + r.color + '"></span><span class="rn">' + esc(r.name) +
+          '</span><span class="ct">' + countIn(r.key) + '</span>' + I.right + '</button></li>';
+      }).join('') + '</ul>' + (hidden ? lockNote(hidden) : '');
+  }
+  function regionHTML(key) {
+    var r = REG[key], list = PUBLIC.filter(function (m) { return m.r === key; });
+    return backBtn('All regions') + '<div class="vh" style="--c:' + r.color + '"><div class="rbar"></div><h2>' + esc(r.name) + '</h2>' +
+      '<p class="sub">' + plural(countIn(key), 'missionary or ministry', 'missionaries & ministries') + '</p></div>' +
+      grouped(list) + sensSection(key);
+  }
+  function listHTML(e) {
+    var list = e.ids.map(function (id) { return BY_ID[id]; });
+    var onePlace = !!placeOf(list);
+    return backBtn() + '<div class="vh"><p class="eyebrow">' + plural(list.length, 'missionary', 'missionaries') + '</p><h2>' + esc(e.title) + '</h2></div>' +
+      (onePlace ? list.slice().sort(function (a, b) { return a.n.localeCompare(b.n); }).map(card).join('') : grouped(list));
+  }
+  function searchHTML(qs) {
+    var list = PUBLIC.filter(function (m) { return matches(m, qs); });
+    if (!list.length) return '<div class="empty">No one matches “' + esc(qs) + '”. Try a last name, a country or a ministry.</div>';
+    return '<div class="vh"><p class="eyebrow">' + plural(list.length, 'result', 'results') + '</p></div>' + grouped(list);
+  }
+  function personHTML(m) {
+    var r = REG[m.r];
+    var pray = (m.pray && m.pray.length) ? m.pray : null;
+    var web = safeUrl(m.web);
+    var defaults = ['For strength, protection and encouragement as they serve.',
+      'For open hearts and lasting fruit from their ministry' + (m.p ? ' in ' + m.at : '') + '.',
+      'For their health, family and daily needs.'];
+    return backBtn() + '<div class="person" style="--c:' + r.color + '">' +
+      (safeUrl(m.photo) ? '<img class="ph" src="' + esc(safeUrl(m.photo)) + '" alt="' + esc(m.n) + '">' : '<span class="av">' + avatar(m) + '</span>') +
+      '<h2>' + esc(m.n) + '</h2>' + (m.o && m.o !== m.n ? '<p class="org">' + esc(m.o) + '</p>' : '') +
+      '<div class="tags"><span class="tag">' + (m.p ? I.pin : I.globe) + esc(m.at) + '</span>' +
+      '<span class="tag"><span class="sw"></span>' + esc(r.name) + '</span>' + (m.ag ? '<span class="tag">Assemblies of God</span>' : '') + '</div>' +
+      (m.m ? '<div class="sec"><h3>Their ministry</h3><p>' + esc(m.m) + '</p></div>' : '') +
+      '<div class="sec"><h3>About</h3>' + (m.bio ? '<p>' + esc(m.bio).replace(/\n/g, '<br>') + '</p>' :
+        '<p class="soon">We\'re gathering their story. Check back soon to learn more about ' + esc(m.n) + ' and what God is doing through their work.</p>') + '</div>' +
+      '<div class="sec"><h3>How to pray</h3><ul class="pray">' +
+        (pray || defaults).map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+        (pray ? '' : '<p class="soon" style="font-size:13.5px;margin-top:2px">Specific prayer requests are coming soon.</p>') + '</div>' +
+      '<div class="acts">' + (web ? '<a class="btn pri" href="' + esc(web) + '" target="_blank" rel="noopener">' + I.link + 'Visit their website</a>' : '') +
+      '<button class="btn" data-share="' + esc(m.id) + '">' + I.share + 'Share</button></div></div>';
+  }
+
+  function setHash(h) {
+    try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
+  }
+
+  function render(e, opts) {
+    opts = opts || {};
+    instant = !!opts.instant;
+    var html = '', z = opts.zoom && ready;
+    if (e.t === 'home') {
+      state.region = null; state.country = null; state.selected = null;
+      if (z) resetZoom();
+      html = homeHTML(); setHash('');
+    } else if (e.t === 'region') {
+      state.region = e.key; state.country = null; state.selected = null;
+      if (z) zoomRegion(e.key);
+      html = regionHTML(e.key); setHash('r/' + e.key);
+    } else if (e.t === 'list') {
+      state.selected = null; state.country = e.country || null;
+      if (z) { var b = boxOf(e.ids.map(function (id) { return BY_ID[id]; }), 3); if (b) zoomToBox(b, 40, 40); }
+      html = listHTML(e);
+    } else if (e.t === 'search') {
+      state.region = null; state.country = null; state.selected = null;
+      html = searchHTML(e.q);
+    } else if (e.t === 'sens') {
+      state.selected = null; state.country = null;
+      html = sensHTML(BY_ID[e.id]);
+    } else if (e.t === 'person') {
+      var m = BY_ID[e.id];
+      state.selected = m.id; state.country = null;
+      if (state.region && state.region !== m.r) state.region = null;
+      if (z) zoomPerson(m);
+      html = personHTML(m); setHash('m/' + m.id);
+    }
+    instant = false;
+    setHTML(view, html);
+    view.scrollTop = 0;
+    syncChips(); paintCountries(); drawPins();
+  }
+  function show(e, opts) {
+    opts = opts || {};
+    if (cur && opts.push !== false) stack.push(cur);
+    cur = e; render(e, opts);
+  }
+  function back() {
+    var e = stack.pop() || { t: 'home' };
+    cur = e; render(e, { zoom: e.t !== 'search' });
+  }
+  function home() { stack = []; q.value = ''; state.query = ''; cur = { t: 'home' }; render(cur, { zoom: true }); }
+  function openPerson(id, opts) {
+    if (!BY_ID[id] || BY_ID[id].s) return;
+    show({ t: 'person', id: id }, { zoom: opts.zoom });
+    if (opts.fromMap && MOBILE.matches) panel.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' });
+  }
+  function selectRegion(key) {
+    q.value = ''; state.query = '';
+    stack = [{ t: 'home' }];
+    cur = { t: 'region', key: key }; render(cur, { zoom: true });
+  }
+
+  view.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-open],[data-sens],[data-region],[data-back],[data-share]');
+    if (!b) return;
+    if (b.dataset.open) openPerson(b.dataset.open, { zoom: true });
+    else if (b.dataset.sens) { if (BY_ID[b.dataset.sens] && BY_ID[b.dataset.sens].s) show({ t: 'sens', id: b.dataset.sens }, { zoom: false }); }
+    else if (b.dataset.region) selectRegion(b.dataset.region);
+    else if (b.hasAttribute('data-back')) back();
+    else if (b.dataset.share) share(BY_ID[b.dataset.share], b);
+  });
+  view.addEventListener('mouseover', function (ev) {
+    var b = ev.target.closest('[data-open]'), id = b && b.dataset.open;
+    gPins.selectAll('g.pin').classed('hot', function (d) { return !!id && d.items.some(function (i) { return i.m.id === id; }); });
+  });
+  view.addEventListener('mouseleave', function () { gPins.selectAll('g.pin').classed('hot', false); });
+
+  function share(m, btn) {
+    var url = location.href.split('#')[0].replace(/([?&])embed=1\b&?/, '$1').replace(/[?&]$/, '') + '#m/' + m.id;
+    if (navigator.share) { navigator.share({ title: m.n + ' · RCC Missions', text: 'Pray with us for ' + m.n + ' (' + m.at + ').', url: url }).catch(function () {}); return; }
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () {
+      var old = Array.prototype.map.call(btn.childNodes, function (n) { return n.cloneNode(true); });
+      btn.textContent = 'Link copied';
+      setTimeout(function () { btn.replaceChildren.apply(btn, old); }, 1600);
+    }).catch(function () { window.prompt('Copy this link:', url); });
+  }
+
+  var searchTimer;
+  q.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () {
+      var v = q.value.trim(); state.query = v;
+      if (v) {
+        if (cur && cur.t === 'search') { cur.q = v; render(cur); }
+        else show({ t: 'search', q: v });
+        if (ready) { var b = boxOf(visiblePins(), 3); if (b) zoomToBox(b, 40, 14); }
+      } else if (cur && cur.t === 'search') back();
+      else drawPins();
+    }, 140);
+  });
+
+  // ---------- chips ----------
+  var chips = document.getElementById('chips');
+  setHTML(chips, '<button class="chip" data-chip="">All</button>' + REGIONS.map(function (r) {
+    return '<button class="chip" data-chip="' + r.key + '"><span class="sw" style="--c:' + r.color + '"></span>' + esc(r.name) + '</button>';
+  }).join(''));
+  chips.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-chip]'); if (!b) return;
+    if (b.dataset.chip) selectRegion(b.dataset.chip); else home();
+  });
+  function syncChips() {
+    chips.querySelectorAll('.chip').forEach(function (c) {
+      var on = (c.dataset.chip || null) === state.region;
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (on && chips.scrollWidth > chips.clientWidth) chips.scrollTo({ left: c.offsetLeft - 12, behavior: REDUCE ? 'auto' : 'smooth' });
+    });
+  }
+
+  document.getElementById('zin').onclick = function () { svg.transition().duration(350).call(zoom.scaleBy, 2); };
+  document.getElementById('zout').onclick = function () { svg.transition().duration(350).call(zoom.scaleBy, .5); };
+  document.getElementById('zreset').onclick = resetZoom;
+
+  document.getElementById('stTotal').textContent = ALL.length;
+  document.getElementById('stRegions').textContent = REGIONS.length;
+
+  // ---------- open from a shared link (#m/as-1 or #r/asia) ----------
+  (function route() {
+    var h = location.hash.replace(/^#\/?/, ''), mm;
+    if ((mm = h.match(/^m\/(.+)$/)) && BY_ID[mm[1]] && !BY_ID[mm[1]].s) { stack = [{ t: 'home' }]; cur = { t: 'person', id: mm[1] }; }
+    else if ((mm = h.match(/^r\/(.+)$/)) && REG[mm[1]]) { stack = [{ t: 'home' }]; cur = { t: 'region', key: mm[1] }; }
+    else { stack = []; cur = { t: 'home' }; }
+  })();
+  render(cur, {});
+
+  // ---------- load the world ----------
+  var getJSON = function (u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }); };
+  var lakesP = getJSON('assets/lakes-50m.json').catch(function () { return null; });
+  getJSON('assets/countries-50m.json').then(function (world) {
+    countries = topojson.feature(world, world.objects.countries).features.filter(function (f) { return f.id !== '010'; });
+    landFC = { type: 'FeatureCollection', features: countries };
+
+    // which country each pin sits in
+    var bounds = countries.map(function (f) { return d3.geoBounds(f); });
+    var inBox = function (i, pt) { var b = bounds[i]; if (b[0][0] > b[1][0]) return true; return pt[0] >= b[0][0] - .5 && pt[0] <= b[1][0] + .5 && pt[1] >= b[0][1] - .5 && pt[1] <= b[1][1] + .5; };
+    var find = function (pt) { for (var i = 0; i < countries.length; i++) if (inBox(i, pt) && d3.geoContains(countries[i], pt)) return countries[i]; return null; };
+    var nudges = [[.4, 0], [-.4, 0], [0, .4], [0, -.4], [.9, .9], [-.9, -.9], [.9, -.9], [-.9, .9], [1.5, 0], [-1.5, 0]];
+    PUBLIC.forEach(function (m) {
+      if (!m.p) return;
+      if (COUNTRY_OVERRIDE[m.id]) { m.country = COUNTRY_OVERRIDE[m.id]; return; }
+      var pt = [m.p[1], m.p[0]], f = find(pt);
+      for (var j = 0; !f && j < nudges.length; j++) f = find([pt[0] + nudges[j][0], pt[1] + nudges[j][1]]);
+      if (f) { m.country = NICE[f.properties.name] || f.properties.name; (f.ms || (f.ms = [])).push(m); }
+    });
+    var set = {}; PUBLIC.forEach(function (m) { if (m.p && m.country) set[m.country] = 1; });
+    document.getElementById('stCountries').textContent = Object.keys(set).length + '+';
+
+    gWorld.append('path').attr('class', 'grat').datum(d3.geoGraticule10());
+    gWorld.selectAll('path.c').data(countries).join('path')
+      .attr('class', function (d) { return 'c' + (d.ms ? ' has' : ''); })
+      .on('click', function (ev, d) {
+        if (!d.ms) return;
+        show({ t: 'list', title: NICE[d.properties.name] || d.properties.name, country: d, ids: d.ms.map(function (m) { return m.id; }) }, { zoom: true });
+      })
+      .on('mousemove', function (ev, d) {
+        if (!d.ms) return hideTip();
+        var p = d3.pointer(ev, svg.node());
+        showTip(p[0], p[1] - 6, [NICE[d.properties.name] || d.properties.name, plural(d.ms.length, 'missionary', 'missionaries')]);
+      })
+      .on('mouseleave', hideTip);
+    var gLakes = gWorld.append('g');
+
+    lakesP.then(function (lakes) {
+      if (lakes) gLakes.selectAll('path').data(lakes.features).join('path').attr('class', 'lake').attr('d', path);
+    });
+    document.getElementById('loading').remove();
+    ready = true;
+    layout();
+    new ResizeObserver(function () { layout(); }).observe(svg.node());
+  }).catch(function (err) {
+    console.error(err);
+    document.getElementById('loading').textContent = 'The map could not load. Please refresh the page.';
+  });
+})();
+</script>
+</body>
+</html>
