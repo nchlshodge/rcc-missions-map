@@ -58,9 +58,9 @@ Then open http://127.0.0.1:8768. Opening `index.html` straight from Finder won't
 
 ## Links and embedding
 
-- `#r/africa` opens a region and `#m/eu-8` opens one missionary, e.g. `https://<site>/#m/eu-8`. The Share button copies these.
-- `?embed=1` hides the header and footer so the map can sit in an iframe on rochesterchristian.church:
+- `#r/africa` opens a region and `#m/eu-8` opens one missionary, e.g. `https://nchlshodge.github.io/rcc-missions-map/#m/eu-8`. The Share button copies these.
+- `?embed=1` hides the header and footer so the map can sit in an embed block on the church website (Nucleus):
 
 ```html
-<iframe src="https://<site>/?embed=1" style="width:100%;height:1100px;border:0" title="Missions map"></iframe>
+<iframe src="https://nchlshodge.github.io/rcc-missions-map/?embed=1" style="width:100%;height:1100px;border:0" title="Missions map"></iframe>
 ```
