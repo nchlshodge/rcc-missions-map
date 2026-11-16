@@ -35,7 +35,7 @@ New missionary: add a line to `window.MISSIONARIES` with an id, region `r`, name
 
 ## Safety rules (please keep these)
 
-- **Sensitive locations:** anyone serving in a closed or sensitive country is listed only as `S('id', 'region')`. No name, place, photo or pin ever appears. They show up only in a count ("12 more serve in sensitive places"). **Never put their real name anywhere in this folder.** The whole site is public.
+- **Undisclosed missionaries:** anyone serving where it isn't safe to share is listed only as `S('x-12', 'A family')` (or `'A missionary'`) in the Undisclosed group. No name, region, place, photo or pin ever appears, and the `x-` numbers are in a mixed order so they don't hint at a region. They can have prayer requests (`pray` in `STORIES`) and nothing else. The private list kept outside this folder says who each number is. **Never put their real names anywhere in this folder.** The whole site is public.
 - No support amounts, account numbers, emails or phone numbers. The spreadsheet has these; the map does not.
 - Mission trip participants (students) are not on the map.
 - The sensitive list was chosen conservatively (creative-access countries, and anyone the spreadsheet itself lists vaguely, like "Northern Asia" or "Eurasia Sensitive"). The missions team should confirm it, and missionaries can be asked directly.

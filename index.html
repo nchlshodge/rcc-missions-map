@@ -451,20 +451,21 @@ html.embed .wrap{margin:0;padding:12px}
     }).join('');
   }
   function lockNote(n) {
-    return '<div class="note">' + I.lock + '<div><b>' + plural(n, 'more serves', 'more serve') + ' in sensitive places.</b> ' +
-      'To protect them and their work, we don\'t show their names, photos or exact locations online. You\'ll find a prayer card for each of them in their region.</div></div>';
+    return '<div class="note">' + I.lock + '<div><b>' + plural(n, 'more serves', 'more serve') + ' where it isn\'t safe to share.</b> ' +
+      'To protect them and their work, we don\'t show their names, photos or locations online. Find their prayer cards under <b>Undisclosed</b>.</div></div>';
   }
-  var sensTitle = function (m) { return m.who + ' serving in ' + m.area; };
+  var sensTitle = function (m) { return m.who; };
+  var sensNum = function (m) { return m.id.replace(/^x-/, ''); };
   function sensCard(m) {
     return '<button class="card" data-sens="' + esc(m.id) + '"><span class="av lock">' + I.lock + '</span>' +
-      '<span class="ci"><span class="nm">' + esc(sensTitle(m)) + '</span><span class="og">Name kept private for their safety</span></span></button>';
+      '<span class="ci"><span class="nm">' + esc(sensTitle(m)) + '</span><span class="og">Prayer card ' + esc(sensNum(m)) + ' · location undisclosed</span></span></button>';
   }
   function sensSection(key) {
     var list = SENS.filter(function (m) { return m.r === key; });
     if (!list.length) return '';
-    list.sort(function (a, b) { return a.area.localeCompare(b.area); });
-    return '<div class="group">Serving in sensitive places · ' + list.length + '</div>' +
-      '<p class="gnote">Their names and exact locations stay private. Tap a card to see how to pray for them.</p>' + list.map(sensCard).join('');
+    list.sort(function (a, b) { return +sensNum(a) - +sensNum(b); });
+    return '<p class="gnote" style="margin-top:4px">These missionaries serve where it isn\'t safe to share their names or where they are. ' +
+      'We still want to pray for them. Tap a card to see how.</p>' + list.map(sensCard).join('');
   }
   function sensHTML(m) {
     var r = REG[m.r];
@@ -473,8 +474,7 @@ html.embed .wrap{margin:0;padding:12px}
       'For strength, rest and encouragement when the work is hard and slow.', 'For the local believers they walk alongside.'];
     return backBtn() + '<div class="person" style="--c:' + r.color + '">' +
       '<span class="av lock">' + I.lock + '</span>' +
-      '<h2>' + esc(sensTitle(m)) + '</h2><p class="org">Name and location kept private for their safety</p>' +
-      '<div class="tags"><span class="tag"><span class="sw"></span>' + esc(r.name) + '</span></div>' +
+      '<h2>' + esc(sensTitle(m)) + '</h2><p class="org">Prayer card ' + esc(sensNum(m)) + ' · name and location kept private for their safety</p>' +
       '<div class="sec"><h3>How to pray</h3><ul class="pray">' + (pray || defaults).map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
         (pray ? '' : '<p class="soon" style="font-size:13.5px;margin-top:2px">Specific prayer requests are coming soon.</p>') + '</div>' +
       '<div class="note">' + I.lock + '<div>Please don\'t try to identify them or share guesses about who they are online. Keeping their names private helps keep them and the people they serve safe.</div></div></div>';
@@ -494,7 +494,7 @@ html.embed .wrap{margin:0;padding:12px}
     var r = REG[key], list = PUBLIC.filter(function (m) { return m.r === key; });
     return backBtn('All regions') + '<div class="vh" style="--c:' + r.color + '"><div class="rbar"></div><h2>' + esc(r.name) + '</h2>' +
       '<p class="sub">' + plural(countIn(key), 'missionary or ministry', 'missionaries & ministries') + '</p></div>' +
-      grouped(list) + sensSection(key);
+      grouped(list) + (key === 'hidden' ? sensSection(key) : '');
   }
   function listHTML(e) {
     var list = e.ids.map(function (id) { return BY_ID[id]; });
@@ -649,7 +649,7 @@ html.embed .wrap{margin:0;padding:12px}
   document.getElementById('zreset').onclick = resetZoom;
 
   document.getElementById('stTotal').textContent = ALL.length;
-  document.getElementById('stRegions').textContent = REGIONS.length;
+  document.getElementById('stRegions').textContent = REGIONS.filter(function (r) { return r.key !== 'hidden'; }).length;
 
   // ---------- open from a shared link (#m/as-1 or #r/asia) ----------
   (function route() {

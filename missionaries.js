@@ -30,11 +30,14 @@ window.REGIONS = [
   { key: 'europe', name: 'Europe',                    color: '#2589E5' },
   { key: 'mideast',name: 'Middle East',               color: '#8E5BD6' },
   { key: 'us',     name: 'USA & Canada',              color: '#D6455D' },
-  { key: 'intl',   name: 'Worldwide',                 color: '#0E9AAB' }
+  { key: 'intl',   name: 'Worldwide',                 color: '#0E9AAB' },
+  { key: 'hidden', name: 'Undisclosed',               color: '#6B7785' }
 ];
 
 // Sensitive entry: only a broad area and 'A couple' / 'A worker'. Never a name, place, photo or pin.
-var S = function (id, r, area, who) { return { id: id, r: r, s: true, area: area, who: who }; };
+// Undisclosed: serving where it isn't safe to share. Only 'A family' or 'A missionary' and prayer needs - never a name, region, place, photo or pin.
+// The private list (outside this folder) says who each x- number is. Keep real names OUT of this file.
+var S = function (id, who) { return { id: id, r: 'hidden', s: true, who: who }; };
 var CAMBODIA = [12.57, 104.99], THAILAND = [15.87, 100.99], INDONESIA = [-2.5, 118.0], SKOREA = [36.5, 127.8], INDIA = [20.59, 78.96];
 var KENYA = [-0.02, 37.91], UGANDA = [1.37, 32.29], ZAMBIA = [-13.13, 27.85], TOGO = [8.62, 0.82];
 var NICARAGUA = [12.87, -85.21], URUGUAY = [-32.52, -55.77], ARGENTINA = [-38.42, -63.62], SURINAME = [3.92, -56.03], CUBA = [21.52, -77.78], GUATEMALA = [15.78, -90.23];
@@ -52,12 +55,8 @@ window.MISSIONARIES = [
   { id: 'as-5',  r: 'asia', n: 'Josh & Tonya Jacks', o: 'Assemblies of God World Missions', ag: true, at: 'Thailand', p: THAILAND },
   { id: 'as-6',  r: 'asia', n: 'Dareth Ly', o: 'Assemblies of God World Missions', ag: true, at: 'Cambodia', p: CAMBODIA },
   { id: 'as-7',  r: 'asia', n: 'Daniel & Kazune Matsunaga', o: 'Assemblies of God World Missions', ag: true, at: 'Japan', p: [36.2, 138.25] },
-  S('as-8', 'asia', 'Central Eurasia', 'A couple'),
-  S('as-9', 'asia', 'Northern Asia', 'A couple'),
-  S('as-10', 'asia', 'South Asia', 'A worker'),
   { id: 'as-11', r: 'asia', n: 'Christine & Antonio Rios', o: 'Assemblies of God World Missions', ag: true, at: 'New Zealand', p: [-40.9, 174.89] },
   { id: 'as-12', r: 'asia', n: 'Jeremy & Tina Skinner', o: 'Assemblies of God World Missions', ag: true, at: 'Indonesia', p: INDONESIA },
-  S('as-13', 'asia', 'East Asia', 'A couple'),
   { id: 'as-14', r: 'asia', n: 'Matt Stahl', o: 'Assemblies of God World Missions', ag: true, m: 'Asia Pacific', at: 'Ulaanbaatar, Mongolia', p: [47.89, 106.91] },
   { id: 'as-15', r: 'asia', n: 'Scott & Ruth Thompson', o: 'Assemblies of God World Missions', ag: true, at: 'Indonesia', p: INDONESIA },
   { id: 'as-16', r: 'asia', n: 'Koren Van Valin', o: 'Assemblies of God World Missions', ag: true, at: 'South Korea', p: SKOREA },
@@ -73,16 +72,9 @@ window.MISSIONARIES = [
 
   // ---------------- Africa ----------------
   { id: 'af-1',  r: 'africa', n: 'Rick Caswell', o: 'Assemblies of God World Missions', ag: true, at: 'Senegal', p: [14.5, -14.45] },
-  S('af-2', 'africa', 'North Africa', 'A couple'),
-  S('af-3', 'africa', 'West Africa', 'A worker'),
   { id: 'af-4',  r: 'africa', n: 'Heather Daka', o: 'Assemblies of God World Missions', ag: true, at: 'Zambia', p: ZAMBIA },
-  S('af-5', 'africa', 'North Africa', 'A couple'),
-  S('af-6', 'africa', 'North Africa', 'A couple'),
   { id: 'af-7',  r: 'africa', n: 'Michael & Kyja Malone', o: 'Assemblies of God World Missions', ag: true, m: 'Live Dead', at: 'Mombasa, Kenya', p: [-4.04, 39.67] },
   { id: 'af-8',  r: 'africa', n: 'Logan & Shannon Nash', o: 'Assemblies of God World Missions', ag: true, at: 'Zimbabwe', p: [-19.02, 29.15] },
-  S('af-9', 'africa', 'North Africa', 'A worker'),
-  S('af-10', 'africa', 'North Africa', 'A couple'),
-  S('af-11', 'africa', 'East Africa', 'A couple'),
   { id: 'af-12', r: 'africa', n: 'Caleb & Sonja Schut', o: 'A Beautiful Response', m: 'Raising Up Hope', at: 'Uganda', p: UGANDA },
   { id: 'af-13', r: 'africa', n: 'Nathan & Danielle Finney', o: 'Overland Missions', at: 'Zambia', p: ZAMBIA },
   { id: 'af-14', r: 'africa', n: 'Jonathon Schwandt', o: 'Rehema Home', at: 'Kenya', p: KENYA },
@@ -139,15 +131,12 @@ window.MISSIONARIES = [
   { id: 'eu-11', r: 'europe', n: 'Keith & Christi Jones', o: 'Assemblies of God World Missions', ag: true, m: 'Europe respite house', at: 'Malaga, Spain', p: MALAGA },
   { id: 'eu-12', r: 'europe', n: 'Jason & Serena Kohler', o: 'Assemblies of God World Missions', ag: true, at: 'Bari, Italy', p: [41.12, 16.87] },
   { id: 'eu-13', r: 'europe', n: 'Rich & Lori McLane', o: 'Assemblies of God World Missions', ag: true, at: 'Poland', p: POLAND },
-  S('eu-14', 'europe', 'Eurasia', 'A couple'),
   { id: 'eu-15', r: 'europe', n: 'Aaron & Kacey Martinez', o: 'Assemblies of God World Missions', ag: true, at: 'Vigo, Spain', p: [42.24, -8.72] },
   { id: 'eu-16', r: 'europe', n: 'Christopher & Lenee Oakley', o: 'Assemblies of God World Missions', ag: true, m: 'Ministry among the Roma people', at: 'Southeast Europe', p: null },
   { id: 'eu-17', r: 'europe', n: 'Jennifer Pasquale', o: 'Assemblies of God World Missions', ag: true, at: 'Rome, Italy', p: ROME },
-  S('eu-18', 'europe', 'Eurasia', 'A couple'),
   { id: 'eu-19', r: 'europe', n: 'Matthew & Christina Powers', o: 'Assemblies of God World Missions', ag: true, at: 'Netherlands', p: [52.13, 5.29] },
   { id: 'eu-20', r: 'europe', n: 'Kirk & Amy Priest', o: 'Assemblies of God World Missions', ag: true, at: 'Germany', p: GERMANY },
   { id: 'eu-21', r: 'europe', n: 'Taylar & Micah Smiley', o: 'Assemblies of God World Missions', ag: true, at: 'Odesa, Ukraine', p: [46.48, 30.72] },
-  S('eu-22', 'europe', 'Central Asia', 'A couple'),
   { id: 'eu-23', r: 'europe', n: 'Brad & Gayle Wickersheim', o: 'Assemblies of God World Missions', ag: true, at: 'Ukraine', p: [49.0, 31.4] },
   { id: 'eu-24', r: 'europe', n: 'Sam Carson', o: 'A Jesus Mission', at: 'Zaporizhzhia, Ukraine', p: [47.84, 35.14] },
   { id: 'eu-25', r: 'europe', n: 'Garrett & Alissa Larsen', o: 'A Jesus Mission', at: 'Cluj-Napoca, Romania', p: [46.77, 23.6] },
@@ -157,29 +146,16 @@ window.MISSIONARIES = [
   { id: 'eu-n2', r: 'europe', n: 'Troy & Ashleigh King', o: 'Assemblies of God World Missions', ag: true, m: "Kids' Romania - Roma villages", at: 'Romania', p: [45.94, 24.97] },
 
   // ---------------- Middle East ----------------
-  S('me-1', 'mideast', 'the Arabian Peninsula', 'A worker'),
-  S('me-2', 'mideast', 'the Middle East', 'A couple'),
-  S('me-3', 'mideast', 'the Arabian Peninsula', 'A worker'),
   { id: 'me-4',  r: 'mideast', n: 'Zach & Shellie Maddox', o: 'Assemblies of God World Missions', ag: true, m: 'Area directors', at: 'Israel & Palestine', p: [31.77, 35.21] },
-  S('me-5', 'mideast', 'the Middle East', 'A couple'),
-  S('me-6', 'mideast', 'the Middle East', 'A couple'),
-  S('me-7', 'mideast', 'the Arabian Peninsula', 'A couple'),
   { id: 'me-8',  r: 'mideast', n: 'Sean & Taylor Seymore', o: 'Assemblies of God World Missions', ag: true, at: 'Georgia & Armenia', p: [40.07, 45.04] },
-  S('me-9', 'mideast', 'Central Asia', 'A couple'),
-  S('me-10', 'mideast', 'the Arab world', 'A couple'),
   { id: 'me-11', r: 'mideast', n: 'Brian Slater', o: 'Blessing Israeli Believers', at: 'Israel', p: ISRAEL },
   { id: 'me-12', r: 'mideast', n: 'Joel & Teresa Jelski', o: 'Fields of Wheat', m: 'Ministering to youth and soldiers', at: 'Israel', p: [32.08, 34.78] },
-  S('me-13', 'mideast', 'the Middle East', 'A couple'),
   { id: 'me-14', r: 'mideast', n: 'Richard & Carolyn Hyde', o: 'Heart of G-d Ministries', at: 'Israel', p: ISRAEL },
   { id: 'me-15', r: 'mideast', n: 'Milad Khoury', o: 'Light to the Nations', m: 'Arab and Israeli ministry', at: 'Israel', p: [32.7, 35.3] },
   { id: 'me-16', r: 'mideast', n: 'Pierre & Gigi Houssney', o: 'Horizons International', at: 'Lebanon', p: [33.85, 35.86] },
   { id: 'me-17', r: 'mideast', n: 'Leon & Nina Mazin', o: 'Heritage of Zion', m: 'Return to Zion', at: 'Haifa, Israel', p: [32.79, 34.99] },
-  S('me-18', 'mideast', 'the Middle East', 'A couple'),
   { id: 'me-19', r: 'mideast', n: 'Ariel & Shayla Hydes', o: 'Tree of Life / Artists for Christian Testimony', at: 'Israel', p: ISRAEL },
-  S('me-20', 'mideast', 'the Arab world', 'A couple'),
   { id: 'me-21', r: 'mideast', n: 'Joseph Haddad', o: 'River of God Lebanese Congregation', at: 'Nahariya, Israel', p: [33.0, 35.1] },
-  S('me-n1', 'mideast', 'the Arabian Peninsula', 'A worker'),
-  S('me-n2', 'mideast', 'Central Asia', 'A worker'),
 
   // ---------------- USA & Canada ----------------
   { id: 'us-1',  r: 'us', n: 'Marcus & Shakinah Amaro', o: 'Assemblies of God World Missions', ag: true, m: 'Serving alongside the Hancocks', at: 'Dearborn, MI', p: DEARBORN },
@@ -235,7 +211,36 @@ window.MISSIONARIES = [
   { id: 'in-9',  r: 'intl', n: 'Ed & Joy Bissonnette', o: 'Cadence International', m: 'Europe directors serving the US military', at: 'Europe', p: null },
   { id: 'in-10', r: 'intl', n: 'Joe & Jill Vincent', o: 'Cadence International', m: 'Serving the US military', at: 'Germany', p: [50.1, 8.0] },
   { id: 'in-n1', r: 'intl', n: 'Sydney Scott', o: 'A Jesus Mission', m: 'Administration', at: 'Worldwide', p: null },
-  { id: 'in-n2', r: 'intl', n: 'Lindsey Smith', o: 'A Jesus Mission', m: 'Indigenous missions', at: 'Worldwide', p: null }
+  { id: 'in-n2', r: 'intl', n: 'Lindsey Smith', o: 'A Jesus Mission', m: 'Indigenous missions', at: 'Worldwide', p: null },
+
+  // ---------------- Undisclosed (order is mixed on purpose) ----------------
+  S('x-1', 'A family'),
+  S('x-2', 'A family'),
+  S('x-3', 'A family'),
+  S('x-4', 'A family'),
+  S('x-5', 'A family'),
+  S('x-6', 'A family'),
+  S('x-7', 'A family'),
+  S('x-8', 'A missionary'),
+  S('x-9', 'A missionary'),
+  S('x-10', 'A missionary'),
+  S('x-11', 'A family'),
+  S('x-12', 'A missionary'),
+  S('x-13', 'A family'),
+  S('x-14', 'A family'),
+  S('x-15', 'A missionary'),
+  S('x-16', 'A family'),
+  S('x-17', 'A missionary'),
+  S('x-18', 'A family'),
+  S('x-19', 'A family'),
+  S('x-20', 'A missionary'),
+  S('x-21', 'A family'),
+  S('x-22', 'A family'),
+  S('x-23', 'A family'),
+  S('x-24', 'A family'),
+  S('x-25', 'A family'),
+  S('x-26', 'A family'),
+  S('x-27', 'A family')
 ];
 
 /*
