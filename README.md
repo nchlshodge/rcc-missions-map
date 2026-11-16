@@ -25,9 +25,12 @@ To add a photo, bio or prayer requests, add or edit their line in `window.STORIE
   photo: 'photos/af-8.jpg',
   bio: 'A short paragraph about them and their work.',
   pray: ['Health for the family', 'New Bible school class in January'],
-  web: 'https://example.org'
+  web: 'https://example.org',
+  news: 'https://example.org/newsletter-signup'
 },
 ```
+
+`news` adds a **Get their newsletter** button and `web` adds **Visit their website**. Each button only appears when its link is filled in. Link to the missionary's own sign-up page (AGWM page, Mailchimp form, etc.); the map never collects anyone's email itself. Never add either link to an Undisclosed card, because a link would reveal who they are (the page ignores them there anyway).
 
 Photos: put a JPG in `photos/` named by the id. Around 800px on the long side is plenty. Faces are framed from the upper third.
 
